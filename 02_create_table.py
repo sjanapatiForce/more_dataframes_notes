@@ -9,10 +9,20 @@ df = pd.DataFrame.from_dict({'name' : ['Sam', 'Ravi', 'Martha'],
                              'role': ['user', 'user', 'admin']})
 try:
     connection.execute("""CREATE TABLE if not exists users 
-                       (name string, email string, role string,
-                       PRIMARY KEY name
+                       (name text primary key, email text, role text,
+                       primary key name
                        """)
-    #df.to_sql(name='users', if_exists ='replace', index=False, con=connection)
+    for i in range(0,3):
+        insert_command = """
+                        INSERT INTO users
+                        (name, email, role)
+                        values(:name, :email, :role)
+                        """
+        connection.execute(insert_command, {'name':df['name'][i], 
+                                            'email':df['email'][i],
+                                            'role':df['role'][i]})
+
+    df.to_sql(name='users', if_exists ='replace', index=False, con=connection)
     #connection.execute("ALTER TABLE users ADD PRIMARY KEY ('name');")
 except Exception:
     print('error')
